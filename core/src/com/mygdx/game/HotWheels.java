@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class HotWheels extends ApplicationAdapter {
 	SpriteBatch batch;
-	Texture img;
+	Texture img; // hi
 	
 	@Override
 	public void create () {
