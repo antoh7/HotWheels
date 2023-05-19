@@ -10,6 +10,7 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
 		config.setTitle("Hot Wheels");
+		config.setWindowedMode(576, 1024);
 		new Lwjgl3Application(new HotWheels(), config);
 	}
 }

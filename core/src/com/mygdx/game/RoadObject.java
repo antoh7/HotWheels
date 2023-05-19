@@ -1,11 +1,11 @@
 package com.mygdx.game;
 
-public class GalaxyObject {
+public class RoadObject {
     float x, y; // координаты
     float width, height; // ширина и высота
     float vx, vy; // скорость (приращение координаты)
 
-    public GalaxyObject(float x, float y, float width, float height) {
+    public RoadObject(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;
         this.width = width;

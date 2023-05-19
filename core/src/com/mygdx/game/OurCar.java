@@ -1,9 +1,9 @@
 package com.mygdx.game;
 
-public class SpaceShip extends GalaxyObject{
+public class OurCar extends RoadObject {
     int lives = 1; // количество жизней
 
-    public SpaceShip(float x, float y, float width, float height) {
+    public OurCar(float x, float y, float width, float height) {
         super(x, y, width, height); // передаём параметры в родительский класс
     }
 

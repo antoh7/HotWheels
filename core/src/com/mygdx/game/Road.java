@@ -1,8 +1,8 @@
 package com.mygdx.game;
 
-public class SpaceSky extends GalaxyObject{
+public class Road extends RoadObject {
 
-    public SpaceSky(float y) {
+    public Road(float y) {
         super(0, y, HotWheels.SCR_WIDTH, HotWheels.SCR_HEIGHT);
         vy = -1;
     }
