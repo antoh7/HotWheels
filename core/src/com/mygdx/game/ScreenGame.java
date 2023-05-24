@@ -29,7 +29,7 @@ public class ScreenGame implements Screen {
     Road[] roads = new Road[2];
     OurCar ourCar;
     ArrayList<OtherCar> otherCars = new ArrayList<>();
-    Preferences prefs = Gdx.app.getPreferences("DrivingGame");
+    public Preferences prefs = Gdx.app.getPreferences("DrivingGame");
 
     long timeEnemySpawn, timeEnemyInterval = 2400;
     int carsOvertook;
@@ -42,9 +42,9 @@ public class ScreenGame implements Screen {
         gs = galaxyShooter;
 
         imgCross = new Texture("cross.png");
-        imgRoad = new Texture("road.png");
+        imgRoad = new Texture("road2.png");
         carOur = new Texture("car.png");
-        enemyCars = new Texture("obstr.png");
+        enemyCars = new Texture("othercar.png");
 
         btnExit = new ImageButton(imgCross, SCR_WIDTH-40, SCR_HEIGHT-40, 30, 30);
 
@@ -172,7 +172,7 @@ public class ScreenGame implements Screen {
 
     void spawnEnemy() {
         if(timeEnemySpawn+timeEnemyInterval < TimeUtils.millis()) {
-            otherCars.add(new OtherCar(100, 100));
+            otherCars.add(new OtherCar(50, 100));
             timeEnemySpawn = TimeUtils.millis();
         }
     }
@@ -199,7 +199,7 @@ public class ScreenGame implements Screen {
 
     void startGame(){
         otherCars.clear();
-        ourCar = new OurCar(SCR_WIDTH/2, 100, 100, 100);
+        ourCar = new OurCar(SCR_WIDTH/2, 100, 50, 100);
         // время начала игры
         timeStart = TimeUtils.millis();
         isCarAlive = true;

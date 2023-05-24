@@ -4,7 +4,6 @@ import static com.mygdx.game.HotWheels.SCR_HEIGHT;
 import static com.mygdx.game.HotWheels.SCR_WIDTH;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -16,8 +15,8 @@ public class ScreenSettings implements Screen {
     TextButton btnMusic;
     TextButton btnClearTable;
     TextButton btnBack;
+    ScreenGame game;
 
-    // состояние - вводим ли имя?
 
     public ScreenSettings(HotWheels galaxyShooter){
         gs = galaxyShooter;
@@ -26,6 +25,8 @@ public class ScreenSettings implements Screen {
         btnMusic = new TextButton(gs.fontLarge, "Music on", 100, 500);
         btnClearTable = new TextButton(gs.fontLarge, "Clear records", 100, 400);
         btnBack = new TextButton(gs.fontLarge, "Back", 100, 100);
+        //объект игрового класса
+        game = new ScreenGame(gs);
         loadSettings();
     }
 
@@ -49,6 +50,8 @@ public class ScreenSettings implements Screen {
             }
             if (btnClearTable.hit(gs.touch.x, gs.touch.y)) {
                 btnClearTable.setText("Records cleared");
+                //game.prefs.putLong("time",0);
+                game.prefs.remove("time");
             }
             if (btnBack.hit(gs.touch.x, gs.touch.y)) {
                 gs.setScreen(gs.screenIntro);
@@ -97,16 +100,14 @@ public class ScreenSettings implements Screen {
     }
 
     void saveSettings() {
-        Preferences pref = Gdx.app.getPreferences("GalaxyShooterSettings");
-        pref.putBoolean("Sound", gs.sound);
-        pref.putBoolean("Music", gs.music);
-        pref.flush();
+        game.prefs.putBoolean("Sound", gs.sound);
+        game.prefs.putBoolean("Music", gs.music);
+        game.prefs.flush();
     }
 
     void loadSettings() {
-        Preferences pref = Gdx.app.getPreferences("GalaxyShooterSettings");
-        if(pref.contains("Sound")) gs.sound = pref.getBoolean("Sound");
-        if(pref.contains("Music")) gs.music = pref.getBoolean("Music");
+        if(game.prefs.contains("Sound")) gs.sound = game.prefs.getBoolean("Sound");
+        if(game.prefs.contains("Music")) gs.music = game.prefs.getBoolean("Music");
         updateButtons();
     }
 
