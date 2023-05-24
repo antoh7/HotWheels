@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 public class OurCar extends RoadObject {
-    int lives = 1; // количество жизней
 
     public OurCar(float x, float y, float width, float height) {
         super(x, y, width, height); // передаём параметры в родительский класс

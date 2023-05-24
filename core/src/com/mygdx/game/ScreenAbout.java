@@ -18,15 +18,15 @@ public class ScreenAbout implements Screen {
                             "языке java с исполь-\n" +
                             "зованием фреймворка\n" +
                             "LibGDX.\n\n" +
-                            "Цель игры - сбивать\n" +
-                            "космические корабли\n" +
-                            "пришельцев. Победи-\n" +
+                            "Цель игры - объезжать\n" +
+                            "препятствия в виде\n" +
+                            "машин. Победи-\n" +
                             "тель попадает в\n" +
                             "таблицу рекордов.";
 
     public ScreenAbout(HotWheels galaxyShooter){
         gs = galaxyShooter;
-        imgBackGround = new Texture("space02.jpg");
+        imgBackGround = new Texture("about.jpg");
         btnBack = new TextButton(gs.fontLarge, "Back", 230, 100);
     }
 

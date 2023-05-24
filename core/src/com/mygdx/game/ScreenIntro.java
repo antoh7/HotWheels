@@ -17,7 +17,7 @@ public class ScreenIntro implements Screen {
 
     public ScreenIntro(HotWheels galaxyShooter){
         gs = galaxyShooter;
-        imgBackGround = new Texture("space00.jpg");
+        imgBackGround = new Texture("menu.jpg");
         btnPlay = new TextButton(gs.fontLarge, "Play", 100, 500);
         btnSettings = new TextButton(gs.fontLarge, "Settings", 100, 400);
         btnAbout = new TextButton(gs.fontLarge, "About", 100, 300);

@@ -4,10 +4,12 @@ import static com.mygdx.game.HotWheels.SCR_HEIGHT;
 import static com.mygdx.game.HotWheels.SCR_WIDTH;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+//import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -17,40 +19,40 @@ public class ScreenGame implements Screen {
     HotWheels gs;
 
     Texture imgCross;
-    Texture imgSpaceSky;
-    Texture imgShip;
-    Texture imgEnemy;
-    Sound sndExplosion;
+    Texture imgRoad;
+    Texture carOur;
+    Texture enemyCars;
+    Music sndExplosion;
 
     ImageButton btnExit;
 
-    Road[] sky = new Road[2];
-    OurCar ship;
-    ArrayList<OtherCar> enemy = new ArrayList<>();
+    Road[] roads = new Road[2];
+    OurCar ourCar;
+    ArrayList<OtherCar> otherCars = new ArrayList<>();
+    Preferences prefs = Gdx.app.getPreferences("DrivingGame");
 
-    public static final int TYPE_ENEMY = 0, TYPE_SHIP = 1;
+    long timeEnemySpawn, timeEnemyInterval = 2400;
+    int carsOvertook;
+    long timeStart,currentTime;
 
-    long timeEnemySpawn, timeEnemyInterval = 1500;
-    long timeShipDestory, timeShipAliveInterval = 5000;
-
-    int kills;
-    boolean isShipAlive;
+    boolean isCarAlive;
     boolean isGameOver;
 
     public ScreenGame(HotWheels galaxyShooter){
         gs = galaxyShooter;
 
         imgCross = new Texture("cross.png");
-        imgSpaceSky = new Texture("stars.png");
-        imgShip = new Texture("our_car.png");
-        imgEnemy = new Texture("other_car.png");
+        imgRoad = new Texture("road.png");
+        carOur = new Texture("car.png");
+        enemyCars = new Texture("obstr.png");
 
         btnExit = new ImageButton(imgCross, SCR_WIDTH-40, SCR_HEIGHT-40, 30, 30);
 
-        sndExplosion = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
+        sndExplosion = Gdx.audio.newMusic(Gdx.files.internal("explosion.mp3"));
+        sndExplosion.setLooping(false);
 
-        sky[0] = new Road(0);
-        sky[1] = new Road(SCR_HEIGHT);
+        roads[0] = new Road(0);
+        roads[1] = new Road(SCR_HEIGHT);
 
         startGame();
     }
@@ -63,71 +65,82 @@ public class ScreenGame implements Screen {
     @Override
     public void render(float delta) {
         // касания экрана
-        if(Gdx.input.isTouched()){
-            gs.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            gs.camera.unproject(gs.touch);
-            ship.vx = (gs.touch.x - ship.x)/50;
-            ship.vy = (gs.touch.y - ship.y)/50;
+        gs.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        gs.camera.unproject(gs.touch);
+        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+            ourCar.x -= 5;
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+            ourCar.x += 5;
+        }
+        if(Gdx.input.justTouched()){
             if(btnExit.hit(gs.touch.x, gs.touch.y)){
                 gs.setScreen(gs.screenIntro);
             }
+
         }
 
         //*****************************  события игры  *********************************************
         // движение неба
-        for (int i = 0; i < sky.length; i++) {
-            sky[i].move();
+        for (int i = 0; i < roads.length; i++) {
+            roads[i].move();
         }
 
         // вражеские корабли
         spawnEnemy();
-        for (int i = 0; i < enemy.size(); i++) {
-            enemy.get(i).move();
-            if(enemy.get(i).outOfScreen()){
-                enemy.remove(i);
-                if(isShipAlive) {
-                    killOurCar();
-                }
+        for (int i = 0; i < otherCars.size(); i++) {
+            otherCars.get(i).move();
+            if(overlap(otherCars.get(i)) && isCarAlive){
+                killOurCar();
+            }
+            if(otherCars.get(i).outOfScreen() && isCarAlive){
+                otherCars.remove(i);
+                carsOvertook++;
                 i--;
             }
+
+
         }
 
         // наш космический корабль
-        if(isShipAlive){
-            ship.move();
-        } else if(!isGameOver){
-            if(timeShipDestory+timeShipAliveInterval<TimeUtils.millis()){
-                isShipAlive = true;
-                ship.x = SCR_WIDTH/2;
-            }
+        if(isCarAlive){
+            ourCar.move();
+            //игровое время
+            currentTime = TimeUtils.millis() - timeStart;
         }
+
+
 
         // **********************  вывод всех изображений  *****************************************
         gs.camera.update();
         gs.batch.setProjectionMatrix(gs.camera.combined); // пересчёт всех размеров вывода картинок под размеры экрана
-        gs.batch.begin(); // начало вывода изображений
-        for (int i = 0; i < sky.length; i++) {
-            gs.batch.draw(imgSpaceSky, sky[i].x, sky[i].y, sky[i].width, sky[i].height);
-        }
-        for (int i = 0; i < enemy.size(); i++) {
-            gs.batch.draw(imgEnemy, enemy.get(i).getX(), enemy.get(i).getY(), enemy.get(i).width, enemy.get(i).height);
+        gs.batch.begin();// начало вывода изображений
+
+        for (int i = 0; i < roads.length; i++) {
+            gs.batch.draw(imgRoad, roads[i].x, roads[i].y, roads[i].width, roads[i].height);
         }
 
-        if(isShipAlive){
-            gs.batch.draw(imgShip, ship.getX(), ship.getY(), ship.width, ship.height);
+        for (int i = 0; i < otherCars.size(); i++) {
+            gs.batch.draw(enemyCars, otherCars.get(i).getX(), otherCars.get(i).getY(), otherCars.get(i).width, otherCars.get(i).height);
         }
-        gs.fontSmall.draw(gs.batch, "KILLS: "+kills, 10, SCR_HEIGHT-10);
+
+        if(isCarAlive){
+            gs.batch.draw(carOur, ourCar.getX(), ourCar.getY(), ourCar.width, ourCar.height);
+        }
         // кнопка дла выхода - крестик
         gs.batch.draw(btnExit.img, btnExit.x, btnExit.y, btnExit.width, btnExit.height);
-        // жизни - маленькие самолётики в правом нижнем углу
-        for (int i = 0; i < ship.lives; i++) {
-            gs.batch.draw(imgShip, SCR_WIDTH-40-i*40, 10, 30, 30);
-        }
-        // вывод GameOver
+        //время в игре
+        gs.fontSmall.draw(gs.batch,"ВРЕМЯ: "+timeToString(currentTime),10,SCR_HEIGHT - 10);
+
+
+        // вывод рекордов
         if(isGameOver) {
             gs.fontLarge.draw(gs.batch, "GAME OVER", 0, SCR_HEIGHT / 2, SCR_WIDTH, Align.center, true);
+            gs.fontSmall.draw(gs.batch,"машин обогнал: "+carsOvertook,0,SCR_HEIGHT/2-70,SCR_HEIGHT-410,Align.center,true);
+            gs.fontSmall.draw(gs.batch,"лучшее время: "+ timeToString(prefs.getLong("time")),0,SCR_HEIGHT/2 - 130,SCR_HEIGHT-410,Align.center,true);
         }
         gs.batch.end(); // завершение вывода изображений
+
     }
 
     @Override
@@ -152,14 +165,14 @@ public class ScreenGame implements Screen {
 
     @Override
     public void dispose() {
-        imgSpaceSky.dispose();
-        imgShip.dispose();
-        imgEnemy.dispose();
+        imgRoad.dispose();
+        carOur.dispose();
+        enemyCars.dispose();
     }
 
     void spawnEnemy() {
         if(timeEnemySpawn+timeEnemyInterval < TimeUtils.millis()) {
-            enemy.add(new OtherCar(100, 100));
+            otherCars.add(new OtherCar(100, 100));
             timeEnemySpawn = TimeUtils.millis();
         }
     }
@@ -167,23 +180,40 @@ public class ScreenGame implements Screen {
     // гибель нашего корабля
     void killOurCar() {
         if(gs.sound) sndExplosion.play();
-        isShipAlive = false;
-        timeShipDestory = TimeUtils.millis();
-        ship.lives--;
-        if(ship.lives == 0) {
-            gameOver();
-        }
+        isCarAlive = false;
+        gameOver();
+
     }
 
     void gameOver(){
         isGameOver = true;
+        if(!prefs.contains("time")){
+            prefs.putLong("time",currentTime);
+            prefs.flush();
+        }
+        if(currentTime < prefs.getLong("time")){
+            prefs.putLong("time",currentTime);
+            prefs.flush();
+        }
     }
 
     void startGame(){
-        enemy.clear();
-        ship = new OurCar(SCR_WIDTH/2, 100, 100, 100);
-        kills = 0;
-        isShipAlive = true;
+        otherCars.clear();
+        ourCar = new OurCar(SCR_WIDTH/2, 100, 100, 100);
+        // время начала игры
+        timeStart = TimeUtils.millis();
+        isCarAlive = true;
         isGameOver = false;
     }
+
+    boolean overlap(OtherCar enemy) {
+        return Math.abs(ourCar.x-enemy.x)<ourCar.width/2+enemy.width/2 & Math.abs(ourCar.y-enemy.y)<ourCar.height/2+enemy.height/2;
+    }
+
+    String timeToString(long t){
+        String sec = "" + t/1000%60/10 + t/1000%60%10;
+        String min = "" + t/1000/60/10 + t/1000/60%10;
+        return min+":"+sec;
+    }
+
 }
