@@ -24,13 +24,12 @@ public class HotWheels extends Game {
     ScreenSettings screenSettings;
     ScreenAbout screenAbout;
 
-    String playerName = "Noname";
     boolean sound = true;
     boolean music = true;
 
     @Override
     public void create () {
-        batch = new SpriteBatch(); // создать объект, отвечающий за вывод изображений
+        batch = new SpriteBatch();
         camera = new OrthographicCamera();
         camera.setToOrtho(false, SCR_WIDTH, SCR_HEIGHT);
         touch = new Vector3();

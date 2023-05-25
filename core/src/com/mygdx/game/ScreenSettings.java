@@ -8,7 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 
 public class ScreenSettings implements Screen {
-    HotWheels gs;
+    HotWheels hw;
     Texture imgBackGround;
 
     TextButton btnSound;
@@ -18,15 +18,15 @@ public class ScreenSettings implements Screen {
     ScreenGame game;
 
 
-    public ScreenSettings(HotWheels galaxyShooter){
-        gs = galaxyShooter;
+    public ScreenSettings(HotWheels hotWheels){
+        hw = hotWheels;
         imgBackGround = new Texture("settings.jpg");
-        btnSound = new TextButton(gs.fontLarge, "Sound on", 100, 600);
-        btnMusic = new TextButton(gs.fontLarge, "Music on", 100, 500);
-        btnClearTable = new TextButton(gs.fontLarge, "Clear records", 100, 400);
-        btnBack = new TextButton(gs.fontLarge, "Back", 100, 100);
+        btnSound = new TextButton(hw.fontLarge, "Sound on", 100, 600);
+        btnMusic = new TextButton(hw.fontLarge, "Music on", 100, 500);
+        btnClearTable = new TextButton(hw.fontLarge, "Clear records", 100, 400);
+        btnBack = new TextButton(hw.fontLarge, "Back", 100, 100);
         //объект игрового класса
-        game = new ScreenGame(gs);
+        game = new ScreenGame(hw);
         loadSettings();
     }
 
@@ -38,23 +38,22 @@ public class ScreenSettings implements Screen {
     public void render(float delta) {
         // касания экрана
         if(Gdx.input.justTouched()){
-            gs.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            gs.camera.unproject(gs.touch);
-            if (btnSound.hit(gs.touch.x, gs.touch.y)) {
-                gs.sound = !gs.sound;
+            hw.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            hw.camera.unproject(hw.touch);
+            if (btnSound.hit(hw.touch.x, hw.touch.y)) {
+                hw.sound = !hw.sound;
                 updateButtons();
             }
-            if (btnMusic.hit(gs.touch.x, gs.touch.y)) {
-                gs.music = !gs.music;
+            if (btnMusic.hit(hw.touch.x, hw.touch.y)) {
+                hw.music = !hw.music;
                 updateButtons();
             }
-            if (btnClearTable.hit(gs.touch.x, gs.touch.y)) {
+            if (btnClearTable.hit(hw.touch.x, hw.touch.y)) {
                 btnClearTable.setText("Records cleared");
-                //game.prefs.putLong("time",0);
                 game.prefs.remove("time");
             }
-            if (btnBack.hit(gs.touch.x, gs.touch.y)) {
-                gs.setScreen(gs.screenIntro);
+            if (btnBack.hit(hw.touch.x, hw.touch.y)) {
+                hw.setScreen(hw.screenIntro);
                 saveSettings();
                 btnClearTable.setText("Clear records");
             }
@@ -62,16 +61,16 @@ public class ScreenSettings implements Screen {
 
 
         // вывод изображений
-        gs.camera.update();
-        gs.batch.setProjectionMatrix(gs.camera.combined);
-        gs.batch.begin();
-        gs.batch.draw(imgBackGround, 0, 0, SCR_WIDTH, SCR_HEIGHT);
-        btnSound.font.draw(gs.batch, btnSound.text, btnSound.x, btnSound.y);
-        btnMusic.font.draw(gs.batch, btnMusic.text, btnMusic.x, btnMusic.y);
-        btnClearTable.font.draw(gs.batch, btnClearTable.text, btnClearTable.x, btnClearTable.y);
-        btnBack.font.draw(gs.batch, btnBack.text, btnBack.x, btnBack.y);
+        hw.camera.update();
+        hw.batch.setProjectionMatrix(hw.camera.combined);
+        hw.batch.begin();
+        hw.batch.draw(imgBackGround, 0, 0, SCR_WIDTH, SCR_HEIGHT);
+        btnSound.font.draw(hw.batch, btnSound.text, btnSound.x, btnSound.y);
+        btnMusic.font.draw(hw.batch, btnMusic.text, btnMusic.x, btnMusic.y);
+        btnClearTable.font.draw(hw.batch, btnClearTable.text, btnClearTable.x, btnClearTable.y);
+        btnBack.font.draw(hw.batch, btnBack.text, btnBack.x, btnBack.y);
 
-        gs.batch.end();
+        hw.batch.end();
     }
 
     @Override
@@ -100,24 +99,24 @@ public class ScreenSettings implements Screen {
     }
 
     void saveSettings() {
-        game.prefs.putBoolean("Sound", gs.sound);
-        game.prefs.putBoolean("Music", gs.music);
+        game.prefs.putBoolean("Sound", hw.sound);
+        game.prefs.putBoolean("Music", hw.music);
         game.prefs.flush();
     }
 
     void loadSettings() {
-        if(game.prefs.contains("Sound")) gs.sound = game.prefs.getBoolean("Sound");
-        if(game.prefs.contains("Music")) gs.music = game.prefs.getBoolean("Music");
+        if(game.prefs.contains("Sound")) hw.sound = game.prefs.getBoolean("Sound");
+        if(game.prefs.contains("Music")) hw.music = game.prefs.getBoolean("Music");
         updateButtons();
     }
 
     void updateButtons() {
-        if (gs.sound) {
+        if (hw.sound) {
             btnSound.setText("Sound on");
         } else {
             btnSound.setText("Sound off");
         }
-        if (gs.music) {
+        if (hw.music) {
             btnMusic.setText("Music on");
         } else {
             btnMusic.setText("Music off");

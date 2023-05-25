@@ -9,37 +9,40 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
-//import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
 
 public class ScreenGame implements Screen {
-    HotWheels gs;
+    HotWheels hw;
 
     Texture imgCross;
     Texture imgRoad;
     Texture carOur;
     Texture enemyCars;
     Music sndExplosion;
+    Music carSound;
 
     ImageButton btnExit;
+    // тестовая анимация
+    Animation<Texture> testAnim;
+    Array<Texture> arr = new Array<>();
+    //
 
     Road[] roads = new Road[2];
     OurCar ourCar;
     ArrayList<OtherCar> otherCars = new ArrayList<>();
     public Preferences prefs = Gdx.app.getPreferences("DrivingGame");
 
-    long timeEnemySpawn, timeEnemyInterval = 2400;
-    int carsOvertook;
-    long timeStart,currentTime;
+    long timeEnemySpawn, timeEnemyInterval = 2400,timeStart,currentTime;
+    int carsOvertook,NFrames,stateTime;
+    boolean isCarAlive,isGameOver;
 
-    boolean isCarAlive;
-    boolean isGameOver;
-
-    public ScreenGame(HotWheels galaxyShooter){
-        gs = galaxyShooter;
+    public ScreenGame(HotWheels hotWheels){
+        hw = hotWheels;
 
         imgCross = new Texture("cross.png");
         imgRoad = new Texture("road2.png");
@@ -50,9 +53,17 @@ public class ScreenGame implements Screen {
 
         sndExplosion = Gdx.audio.newMusic(Gdx.files.internal("explosion.mp3"));
         sndExplosion.setLooping(false);
+        carSound = Gdx.audio.newMusic(Gdx.files.internal("carroar.mp3"));
+        // количество картинок для анимации
+        NFrames = 5;
 
         roads[0] = new Road(0);
         roads[1] = new Road(SCR_HEIGHT);
+
+        for (int i = 0; i < NFrames; i++) {
+            arr.add(new Texture(i+".png"));
+        }
+        testAnim = new Animation<>(0.7f,arr);
 
         startGame();
     }
@@ -60,33 +71,42 @@ public class ScreenGame implements Screen {
     @Override
     public void show() {
         startGame();
+        if(hw.music) {
+            carSound.play();
+        }
+        carSound.setLooping(true);
     }
 
     @Override
     public void render(float delta) {
         // касания экрана
-        gs.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        gs.camera.unproject(gs.touch);
-        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
-            ourCar.x -= 5;
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.D)){
-            ourCar.x += 5;
+        hw.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        hw.camera.unproject(hw.touch);
+        if(isCarAlive) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                ourCar.x -= 5;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                ourCar.x += 5;
+            }
         }
         if(Gdx.input.justTouched()){
-            if(btnExit.hit(gs.touch.x, gs.touch.y)){
-                gs.setScreen(gs.screenIntro);
+            if(btnExit.hit(hw.touch.x, hw.touch.y)){
+                hw.setScreen(hw.screenIntro);
+                //остановка всех звуков
+                carSound.stop();
+                sndExplosion.stop();
             }
 
         }
 
         //*****************************  события игры  *********************************************
-        // движение неба
+        // движение дороги
         for (int i = 0; i < roads.length; i++) {
             roads[i].move();
         }
 
-        // вражеские корабли
+        // вражеские машины
         spawnEnemy();
         for (int i = 0; i < otherCars.size(); i++) {
             otherCars.get(i).move();
@@ -102,44 +122,49 @@ public class ScreenGame implements Screen {
 
         }
 
-        // наш космический корабль
+        // машина двигается
         if(isCarAlive){
             ourCar.move();
             //игровое время
             currentTime = TimeUtils.millis() - timeStart;
         }
+        // время последнего вызова render()
+        stateTime+=Gdx.graphics.getDeltaTime();
 
 
 
         // **********************  вывод всех изображений  *****************************************
-        gs.camera.update();
-        gs.batch.setProjectionMatrix(gs.camera.combined); // пересчёт всех размеров вывода картинок под размеры экрана
-        gs.batch.begin();// начало вывода изображений
+        hw.camera.update();
+        hw.batch.setProjectionMatrix(hw.camera.combined); // пересчёт всех размеров вывода картинок под размеры экрана
+        hw.batch.begin();// начало вывода изображений
 
         for (int i = 0; i < roads.length; i++) {
-            gs.batch.draw(imgRoad, roads[i].x, roads[i].y, roads[i].width, roads[i].height);
+            hw.batch.draw(imgRoad, roads[i].x, roads[i].y, roads[i].width, roads[i].height);
         }
 
         for (int i = 0; i < otherCars.size(); i++) {
-            gs.batch.draw(enemyCars, otherCars.get(i).getX(), otherCars.get(i).getY(), otherCars.get(i).width, otherCars.get(i).height);
+            hw.batch.draw(enemyCars, otherCars.get(i).getX(), otherCars.get(i).getY(), otherCars.get(i).width, otherCars.get(i).height);
         }
 
         if(isCarAlive){
-            gs.batch.draw(carOur, ourCar.getX(), ourCar.getY(), ourCar.width, ourCar.height);
+            hw.batch.draw(carOur, ourCar.getX(), ourCar.getY(), ourCar.width, ourCar.height);
         }
         // кнопка дла выхода - крестик
-        gs.batch.draw(btnExit.img, btnExit.x, btnExit.y, btnExit.width, btnExit.height);
+        hw.batch.draw(btnExit.img, btnExit.x, btnExit.y, btnExit.width, btnExit.height);
         //время в игре
-        gs.fontSmall.draw(gs.batch,"ВРЕМЯ: "+timeToString(currentTime),10,SCR_HEIGHT - 10);
+        hw.fontSmall.draw(hw.batch,"ВРЕМЯ: "+timeToString(currentTime),10,SCR_HEIGHT - 10);
 
 
         // вывод рекордов
         if(isGameOver) {
-            gs.fontLarge.draw(gs.batch, "GAME OVER", 0, SCR_HEIGHT / 2, SCR_WIDTH, Align.center, true);
-            gs.fontSmall.draw(gs.batch,"машин обогнал: "+carsOvertook,0,SCR_HEIGHT/2-70,SCR_HEIGHT-410,Align.center,true);
-            gs.fontSmall.draw(gs.batch,"лучшее время: "+ timeToString(prefs.getLong("time")),0,SCR_HEIGHT/2 - 130,SCR_HEIGHT-410,Align.center,true);
+            for (int i = 0; i < NFrames; i++) {
+                hw.batch.draw(testAnim.getKeyFrame(stateTime),ourCar.x,ourCar.y,ourCar.width,ourCar.height);
+            }
+            hw.fontLarge.draw(hw.batch, "GAME OVER", 0, SCR_HEIGHT / 2, SCR_WIDTH, Align.center, true);
+            hw.fontSmall.draw(hw.batch,"машин обогнал: "+carsOvertook,0,SCR_HEIGHT/2-90,SCR_HEIGHT-410,Align.center,true);
+            hw.fontSmall.draw(hw.batch,"лучшее время: "+ timeToString(prefs.getLong("time")),0,SCR_HEIGHT/2 - 150,SCR_HEIGHT-410,Align.center,true);
         }
-        gs.batch.end(); // завершение вывода изображений
+        hw.batch.end(); // завершение вывода изображений
 
     }
 
@@ -172,14 +197,14 @@ public class ScreenGame implements Screen {
 
     void spawnEnemy() {
         if(timeEnemySpawn+timeEnemyInterval < TimeUtils.millis()) {
-            otherCars.add(new OtherCar(50, 100));
+            otherCars.add(new OtherCar(75, 150));
             timeEnemySpawn = TimeUtils.millis();
         }
     }
 
-    // гибель нашего корабля
+    // гибель машины
     void killOurCar() {
-        if(gs.sound) sndExplosion.play();
+        if(hw.sound) sndExplosion.play();
         isCarAlive = false;
         gameOver();
 
@@ -187,19 +212,13 @@ public class ScreenGame implements Screen {
 
     void gameOver(){
         isGameOver = true;
-        if(!prefs.contains("time")){
-            prefs.putLong("time",currentTime);
-            prefs.flush();
-        }
-        if(currentTime < prefs.getLong("time")){
-            prefs.putLong("time",currentTime);
-            prefs.flush();
-        }
+        carSound.stop();
+        saveRecords();
     }
 
     void startGame(){
         otherCars.clear();
-        ourCar = new OurCar(SCR_WIDTH/2, 100, 50, 100);
+        ourCar = new OurCar(SCR_WIDTH/2, 100, 75, 150);
         // время начала игры
         timeStart = TimeUtils.millis();
         isCarAlive = true;
@@ -214,6 +233,18 @@ public class ScreenGame implements Screen {
         String sec = "" + t/1000%60/10 + t/1000%60%10;
         String min = "" + t/1000/60/10 + t/1000/60%10;
         return min+":"+sec;
+    }
+
+    void saveRecords(){
+        if(!prefs.contains("time")){
+            prefs.putLong("time",currentTime);
+            prefs.flush();
+        }
+        if(currentTime > prefs.getLong("time")){
+            prefs.putLong("time",currentTime);
+            prefs.flush();
+        }
+
     }
 
 }

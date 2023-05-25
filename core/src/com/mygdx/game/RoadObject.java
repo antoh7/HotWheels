@@ -3,7 +3,7 @@ package com.mygdx.game;
 public class RoadObject {
     float x, y; // координаты
     float width, height; // ширина и высота
-    float vx, vy; // скорость (приращение координаты)
+    float vx, vy; // скорость
 
     public RoadObject(float x, float y, float width, float height) {
         this.x = x;

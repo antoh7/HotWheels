@@ -8,26 +8,27 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 
 public class ScreenAbout implements Screen {
-    HotWheels gs;
-    Texture imgBackGround; // фоновое изображение
+    HotWheels hw;
+    Texture imgBackGround;
     TextButton btnBack;
     String textAboutGame =
-                            "Эта игра создана в\n" +
-                            "рамках курса Mbile\n" +
-                            "Game Development на\n" +
-                            "языке java с исполь-\n" +
-                            "зованием фреймворка\n" +
-                            "LibGDX.\n\n" +
-                            "Цель игры - объезжать\n" +
-                            "препятствия в виде\n" +
-                            "машин. Победи-\n" +
-                            "тель попадает в\n" +
-                            "таблицу рекордов.";
+                            "Цель игры - объез-\n" +
+                            "жать препятствия в \n" +
+                            "виде машин. Большее \n" +
+                            "время попадает в \n" +
+                            "таблицу рекордов.\n "+
+                            "\n"+
+                            "Управление: \n"+
+                             "A - влево,D - вправо.\n"+
+                            "X (кнопка вверху) - \n"+
+                            "выход на главное меню.";
 
-    public ScreenAbout(HotWheels galaxyShooter){
-        gs = galaxyShooter;
+
+
+    public ScreenAbout(HotWheels hotWheels){
+        hw = hotWheels;
         imgBackGround = new Texture("about.jpg");
-        btnBack = new TextButton(gs.fontLarge, "Back", 230, 100);
+        btnBack = new TextButton(hw.fontLarge, "Back", 230, 100);
     }
 
     @Override
@@ -39,25 +40,24 @@ public class ScreenAbout implements Screen {
     public void render(float delta) {
         // касания экрана
         if(Gdx.input.justTouched()){
-            gs.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-            gs.camera.unproject(gs.touch);
+            hw.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            hw.camera.unproject(hw.touch);
 
-            if(btnBack.hit(gs.touch.x, gs.touch.y)){
-                gs.setScreen(gs.screenIntro);
+            if(btnBack.hit(hw.touch.x, hw.touch.y)){
+                hw.setScreen(hw.screenIntro);
             }
         }
 
-        // события игры
 
 
         // вывод изображений
-        gs.camera.update();
-        gs.batch.setProjectionMatrix(gs.camera.combined);
-        gs.batch.begin();
-        gs.batch.draw(imgBackGround, 0, 0, SCR_WIDTH, SCR_HEIGHT);
-        gs.fontLarge.draw(gs.batch, textAboutGame, 20, SCR_HEIGHT-100);
-        btnBack.font.draw(gs.batch, btnBack.text, btnBack.x, btnBack.y);
-        gs.batch.end();
+        hw.camera.update();
+        hw.batch.setProjectionMatrix(hw.camera.combined);
+        hw.batch.begin();
+        hw.batch.draw(imgBackGround, 0, 0, SCR_WIDTH, SCR_HEIGHT);
+        hw.fontLarge.draw(hw.batch, textAboutGame, 20, SCR_HEIGHT-100);
+        btnBack.font.draw(hw.batch, btnBack.text, btnBack.x, btnBack.y);
+        hw.batch.end();
     }
 
     @Override

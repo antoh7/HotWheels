@@ -4,7 +4,7 @@ public class Road extends RoadObject {
 
     public Road(float y) {
         super(0, y, HotWheels.SCR_WIDTH, HotWheels.SCR_HEIGHT);
-        vy = -1;
+        vy = -3;
     }
 
     @Override
