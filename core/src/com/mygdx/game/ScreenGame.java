@@ -80,8 +80,26 @@ public class ScreenGame implements Screen {
     @Override
     public void render(float delta) {
         // касания экрана
-        hw.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-        hw.camera.unproject(hw.touch);
+        if(Gdx.input.isTouched()) {
+            hw.touch.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+            hw.camera.unproject(hw.touch);
+            if (hw.touch.x > ourCar.x) {
+                ourCar.x += 5;
+            }
+            if (hw.touch.x < ourCar.x) {
+                ourCar.x -= 5;
+            }
+        }
+        // обработка экранных кнопок
+        if(Gdx.input.justTouched()){
+            if(btnExit.hit(hw.touch.x, hw.touch.y)){
+                hw.setScreen(hw.screenIntro);
+                //остановка всех звуков
+                carSound.stop();
+                sndExplosion.stop();
+            }
+        }
+        // обработка нажатия клавиш на клавиатуре
         if(isCarAlive) {
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
                 ourCar.x -= 5;
@@ -90,20 +108,13 @@ public class ScreenGame implements Screen {
                 ourCar.x += 5;
             }
         }
-        if(Gdx.input.justTouched()){
-            if(btnExit.hit(hw.touch.x, hw.touch.y)){
-                hw.setScreen(hw.screenIntro);
-                //остановка всех звуков
-                carSound.stop();
-                sndExplosion.stop();
-            }
-
-        }
 
         //*****************************  события игры  *********************************************
         // движение дороги
-        for (int i = 0; i < roads.length; i++) {
-            roads[i].move();
+        if(isCarAlive) {
+            for (int i = 0; i < roads.length; i++) {
+                roads[i].move();
+            }
         }
 
         // вражеские машины
