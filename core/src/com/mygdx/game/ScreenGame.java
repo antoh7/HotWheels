@@ -54,7 +54,7 @@ public class ScreenGame implements Screen {
         sndExplosion = Gdx.audio.newMusic(Gdx.files.internal("explosion.mp3"));
         sndExplosion.setLooping(false);
         carSound = Gdx.audio.newMusic(Gdx.files.internal("carroar.mp3"));
-        // количество картинок для анимации
+        // количество картинок для анимации 111111
         NFrames = 5;
 
         roads[0] = new Road(0);
