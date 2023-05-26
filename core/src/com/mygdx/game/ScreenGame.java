@@ -9,9 +9,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -27,10 +25,6 @@ public class ScreenGame implements Screen {
     Music carSound;
 
     ImageButton btnExit;
-    // тестовая анимация
-    Animation<Texture> testAnim;
-    Array<Texture> arr = new Array<>();
-    //
 
     Road[] roads = new Road[2];
     OurCar ourCar;
@@ -38,7 +32,7 @@ public class ScreenGame implements Screen {
     public Preferences prefs = Gdx.app.getPreferences("DrivingGame");
 
     long timeEnemySpawn, timeEnemyInterval = 2400,timeStart,currentTime;
-    int carsOvertook,NFrames,stateTime;
+    int carsOvertook;
     boolean isCarAlive,isGameOver;
 
     public ScreenGame(HotWheels hotWheels){
@@ -54,17 +48,9 @@ public class ScreenGame implements Screen {
         sndExplosion = Gdx.audio.newMusic(Gdx.files.internal("explosion.mp3"));
         sndExplosion.setLooping(false);
         carSound = Gdx.audio.newMusic(Gdx.files.internal("carroar.mp3"));
-        // количество картинок для анимации 111111
-        NFrames = 5;
 
         roads[0] = new Road(0);
         roads[1] = new Road(SCR_HEIGHT);
-
-        for (int i = 0; i < NFrames; i++) {
-            arr.add(new Texture(i+".png"));
-        }
-        testAnim = new Animation<>(0.7f,arr);
-
         startGame();
     }
 
@@ -111,11 +97,10 @@ public class ScreenGame implements Screen {
 
         //*****************************  события игры  *********************************************
         // движение дороги
-        if(isCarAlive) {
-            for (int i = 0; i < roads.length; i++) {
-                roads[i].move();
-            }
+        for (int i = 0; i < roads.length; i++) {
+            roads[i].move();
         }
+
 
         // вражеские машины
         spawnEnemy();
@@ -129,8 +114,6 @@ public class ScreenGame implements Screen {
                 carsOvertook++;
                 i--;
             }
-
-
         }
 
         // машина двигается
@@ -139,8 +122,6 @@ public class ScreenGame implements Screen {
             //игровое время
             currentTime = TimeUtils.millis() - timeStart;
         }
-        // время последнего вызова render()
-        stateTime+=Gdx.graphics.getDeltaTime();
 
 
 
@@ -168,9 +149,6 @@ public class ScreenGame implements Screen {
 
         // вывод рекордов
         if(isGameOver) {
-            for (int i = 0; i < NFrames; i++) {
-                hw.batch.draw(testAnim.getKeyFrame(stateTime),ourCar.x,ourCar.y,ourCar.width,ourCar.height);
-            }
             hw.fontLarge.draw(hw.batch, "GAME OVER", 0, SCR_HEIGHT / 2, SCR_WIDTH, Align.center, true);
             hw.fontSmall.draw(hw.batch,"машин обогнал: "+carsOvertook,0,SCR_HEIGHT/2-90,SCR_HEIGHT-410,Align.center,true);
             hw.fontSmall.draw(hw.batch,"лучшее время: "+ timeToString(prefs.getLong("time")),0,SCR_HEIGHT/2 - 150,SCR_HEIGHT-410,Align.center,true);
@@ -234,6 +212,7 @@ public class ScreenGame implements Screen {
         timeStart = TimeUtils.millis();
         isCarAlive = true;
         isGameOver = false;
+        carsOvertook = 0;
     }
 
     boolean overlap(OtherCar enemy) {

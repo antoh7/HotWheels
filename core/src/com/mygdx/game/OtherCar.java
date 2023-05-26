@@ -20,4 +20,10 @@ public class OtherCar extends RoadObject {
     int randomX(int... nX){
         return nX[MathUtils.random(0,nX.length-1)];
     }
+    void otherCarsOverlapping(OtherCar car) {
+        if ((this.x <= car.x && this.x >= car.x - car.width) && (this.y - this.height - car.y >= 3)) {
+            this.vy += 1;
+        }
+    }
+
 }
