@@ -106,6 +106,15 @@ public class ScreenGame implements Screen {
         spawnEnemy();
         for (int i = 0; i < otherCars.size(); i++) {
             otherCars.get(i).move();
+
+            // проверка на столкновение вражеских машин
+            for (int j = 0; j < otherCars.size()-1; j++) {
+                if (j != i) {
+                    otherCars.get(i).otherCarsOverlapping(otherCars.get(j));
+                    break;
+                }
+            }
+
             if(overlap(otherCars.get(i)) && isCarAlive){
                 killOurCar();
             }
@@ -236,5 +245,4 @@ public class ScreenGame implements Screen {
         }
 
     }
-
 }

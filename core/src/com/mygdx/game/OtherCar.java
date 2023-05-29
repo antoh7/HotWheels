@@ -20,10 +20,12 @@ public class OtherCar extends RoadObject {
     int randomX(int... nX){
         return nX[MathUtils.random(0,nX.length-1)];
     }
+    // проверка на столкновение вражеских машин
     void otherCarsOverlapping(OtherCar car) {
-        if ((this.x <= car.x && this.x >= car.x - car.width) && (this.y - this.height - car.y >= 3)) {
-            this.vy += 1;
+       if ((this.x == car.x ) && (this.y - this.height <= car.y && this.y - this.height >= car.y-height )) {
+           this.vy+=1.5;
         }
+
     }
 
 }
