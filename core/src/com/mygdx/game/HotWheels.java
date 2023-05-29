@@ -11,7 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class HotWheels extends Game {
     // ширина и высота экрана
-    public static final float SCR_WIDTH = 576, SCR_HEIGHT = 1024;
+    public static final float SCR_WIDTH = 576, SCR_HEIGHT = 650;
 
     // системные объекты
     SpriteBatch batch; // ссылка на объект, отвечающий за вывод изображений

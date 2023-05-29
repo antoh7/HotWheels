@@ -117,9 +117,11 @@ public class ScreenGame implements Screen {
             if(overlap(otherCars.get(i)) && isCarAlive){
                 killOurCar();
             }
-            if(otherCars.get(i).outOfScreen() && isCarAlive){
+            if(otherCars.get(i).outOfScreen()){
                 otherCars.remove(i);
-                carsOvertook++;
+                if(isCarAlive) {
+                    carsOvertook++;
+                }
                 i--;
             }
         }
