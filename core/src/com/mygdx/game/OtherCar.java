@@ -22,7 +22,7 @@ public class OtherCar extends RoadObject {
     // проверка на столкновение вражеских машин
     void otherCarsOverlapping(OtherCar car) {
        if ((this.x == car.x ) && (this.y - this.height <= car.y && this.y - this.height >= car.y-height )) {
-           this.vy+=0.3;
+           this.vy+=Math.abs(this.vy/3);
         }
 
     }
