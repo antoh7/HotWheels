@@ -111,7 +111,6 @@ public class ScreenGame implements Screen {
             for (int j = 0; j < otherCars.size()-1; j++) {
                 if (j != i) {
                     otherCars.get(i).otherCarsOverlapping(otherCars.get(j));
-                    break;
                 }
             }
 

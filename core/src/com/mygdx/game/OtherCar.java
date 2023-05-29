@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 import static com.mygdx.game.HotWheels.SCR_HEIGHT;
-import static com.mygdx.game.HotWheels.SCR_WIDTH;
 
 import com.badlogic.gdx.math.MathUtils;
 
@@ -23,7 +22,7 @@ public class OtherCar extends RoadObject {
     // проверка на столкновение вражеских машин
     void otherCarsOverlapping(OtherCar car) {
        if ((this.x == car.x ) && (this.y - this.height <= car.y && this.y - this.height >= car.y-height )) {
-           this.vy+=1.5;
+           this.vy+=0.3;
         }
 
     }
