@@ -9,6 +9,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -20,7 +21,7 @@ public class ScreenGame implements Screen {
     Texture imgCross;
     Texture imgRoad;
     Texture carOur;
-    Texture enemyCars;
+    Texture[] enemyCars = new Texture[2];
     Music sndExplosion;
     Music carSound;
 
@@ -40,8 +41,9 @@ public class ScreenGame implements Screen {
 
         imgCross = new Texture("cross.png");
         imgRoad = new Texture("road2.png");
-        carOur = new Texture("car.png");
-        enemyCars = new Texture("othercar.png");
+        carOur = new Texture("car1.png");
+        enemyCars[0] = new Texture("enemycar0.png");
+        enemyCars[1] = new Texture("enemycar1.png");
 
         btnExit = new ImageButton(imgCross, SCR_WIDTH-40, SCR_HEIGHT-40, 30, 30);
 
@@ -151,7 +153,7 @@ public class ScreenGame implements Screen {
         }
 
         for (int i = 0; i < otherCars.size(); i++) {
-            hw.batch.draw(enemyCars, otherCars.get(i).getX(), otherCars.get(i).getY(), otherCars.get(i).width, otherCars.get(i).height);
+            hw.batch.draw(enemyCars[otherCars.get(i).type], otherCars.get(i).getX(), otherCars.get(i).getY(), otherCars.get(i).width, otherCars.get(i).height);
         }
 
         if(isCarAlive){
@@ -197,12 +199,13 @@ public class ScreenGame implements Screen {
     public void dispose() {
         imgRoad.dispose();
         carOur.dispose();
-        enemyCars.dispose();
+        enemyCars[0].dispose();
+        enemyCars[1].dispose();
     }
 
     void spawnEnemy() {
         if(timeEnemySpawn+timeEnemyInterval < TimeUtils.millis()) {
-            otherCars.add(new OtherCar(75, 150));
+            otherCars.add(new OtherCar(90, 200));
             timeEnemySpawn = TimeUtils.millis();
         }
     }
