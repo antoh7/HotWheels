@@ -75,6 +75,12 @@ public class ScreenGame implements Screen {
             if (hw.touch.x < ourCar.x) {
                 ourCar.x -= 5;
             }
+            if (hw.touch.y > ourCar.y) {
+                ourCar.y += 4;
+            }
+            if (hw.touch.y < ourCar.y) {
+                ourCar.y -= 4;
+            }
         }
         // обработка экранных кнопок
         if(Gdx.input.justTouched()){
